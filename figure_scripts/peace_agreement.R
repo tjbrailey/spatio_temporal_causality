@@ -2,6 +2,7 @@
 # calculating test statistics for different
 # null hypothesis alongside with permutations
 ##################################"
+rm(list = ls())
 setwd(dirname(rstudioapi::getActiveDocumentContext()$path))
 library(ggplot2)
 library(foreach)
@@ -12,7 +13,7 @@ theme_set(theme_bw())
 # dat <- read.table("../Conflict_Data/data_xy_20190205.txt", header = TRUE)
 # dat1 <- subset(dat, country_name == "COL")
 # df <- read.table("data_xy_colombia_20191219.txt", header = T)
-df <- read.table("data_xy_colombia_20200616.txt", header = T)
+df <- read.table(paste0(here::here(), "/data/data_xy_colombia_20200327.txt"), header = T)
 df.a <- aggregate(nr_fatalities ~ Year, df, sum)
 df.a <- aggregate(nr_fatalities ~ Year, df, function(x) sum(x>0))
 df.a$FL_km <- c(NA, aggregate(FL_km ~ Year, subset(df, Year %in% 2001:2018), sum, na.rm=1)$FL_km)
@@ -38,11 +39,6 @@ p.fl <- ggplot() + geom_rect(data = rects, aes(xmin = xstart, xmax = xend, ymin 
   theme(legend.position = "none")
 p.fl
 
-pdf("../figures/effect_of_peace_agreement1_new.pdf", width=6, height = 4)
-p.c
-dev.off()
+ggsave(plot = p.c, filename = paste0(here::here(), "/figures/effect_of_peace_agreement1_new.pdf"))
 
-pdf("../figures/effect_of_peace_agreement2.pdf", width=6, height = 4)
-p.fl
-dev.off()
-
+ggsave(plot = p.fl, filename = paste0(here::here(), "/figures/effect_of_peace_agreement1_new.pdf"))

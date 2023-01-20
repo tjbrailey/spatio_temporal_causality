@@ -1,3 +1,5 @@
+
+rm(list = ls())
 setwd(dirname(rstudioapi::getActiveDocumentContext()$path))
 library(foreach)
 library(ggplot2)
@@ -18,6 +20,4 @@ p <- ggplot(df, aes(x,y,group=z)) +
   theme(axis.text = element_text(size=10))
 p
 
-pdf("../figures/plot_remark.pdf", width=15, height=2)
-p
-dev.off()
+ggsave(plot = p, filename = paste0(here::here(), "/figures/plot_remark.pdf"))

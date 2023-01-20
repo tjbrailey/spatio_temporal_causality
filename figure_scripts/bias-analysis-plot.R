@@ -1,3 +1,4 @@
+rm(list = ls())
 setwd(dirname(rstudioapi::getActiveDocumentContext()$path))
 library(ggplot2)
 library(foreach)
@@ -6,7 +7,7 @@ library(reshape2)
 library(EnvStats)
 theme_set(theme_bw())
 
-out <- read.table("2021-02-19_bias-analisys.txt", header = TRUE)
+out <- read.table(paste0(here::here(), "/data/2021-02-19_bias-analisys.txt"), header = TRUE)
 out$method <- factor(out$method, levels = c("conf", "adjustH", "lscm"))
 out.agg <- aggregate(bias ~ a+b+method, FUN=mean, out)
 out.agg$ts.true <- aggregate(ts.true ~ a+b+method, FUN=mean, out)$ts.true
@@ -22,10 +23,5 @@ p.bias <- ggplot(out.agg, aes(a,b,fill=bias)) +
   xlab("causal effect of log W (alpha)") + ylab("causal effect of X (beta)")
 p.bias
 
-pdf("bias.pdf", width = 15*.85, height = 4.9*.85)
-p.bias
-dev.off()
-
-pdf("../figures/bias.pdf", width = 15*.85, height = 4.9*.85)
-p.bias
-dev.off()
+ggsave(plot = p.bias, filename = paste0(here::here(), "/figures/bias.pdf"), 
+       width = 15*.85, height = 4.9*.85)

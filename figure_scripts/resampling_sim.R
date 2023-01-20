@@ -2,6 +2,7 @@
 # calculating test statistics for different
 # null hypothesis alongside with permutations
 ##################################"
+rm(list=ls())
 setwd(dirname(rstudioapi::getActiveDocumentContext()$path))
 library(ggplot2)
 library(foreach)
@@ -11,7 +12,7 @@ theme_set(theme_bw())
 
 
 # dat <- read.table("data_xy_colombia_20200327.txt", header = TRUE)
-dat <- read.table("data_xy_colombia_20200616.txt", header = TRUE)
+dat <- read.table(paste0(here::here(), "/data/data_xy_colombia_20200327.txt"), header = TRUE)
 dat <- dat[order(dat$PolygonID),]
 n <- nrow(dat)
 nt <-  length(unique(dat$Year))
@@ -27,11 +28,11 @@ roaddist <- dat$RoadDist
 ############ absolute forest loss ############ 
 
 # average deforestation rate
-mean(fl,na.rm=1) # 0.193
+mean(fl,na.rm = TRUE) # 0.193
 # average deforestation at conflict
-mean(fl[c],na.rm=1) # 0.266
+mean(fl[c],na.rm = TRUE) # 0.266
 # average deforestation NOT at conflict
-mean(fl[!c],na.rm=1) # 0.193
+mean(fl[!c],na.rm = TRUE) # 0.193
 # t-test
 t.test(fl~c)$p.value # 8.416e-10
 
@@ -43,7 +44,7 @@ t.test(fl~c)$p.value # 8.416e-10
 ## no confounder
 ##########
 ts.noconf <- function(c,fl){
-  mean(fl[c],na.rm=1)-mean(fl[!c],na.rm=1)
+  mean(fl[c],na.rm = TRUE)-mean(fl[!c],na.rm = TRUE)
 }
 
 ##########
@@ -64,7 +65,7 @@ ts.popdens <- function(c,fl){
     ind.qi <- popdens.quantile.groups[[i]]
     confl.qi <- intersect(which(c), ind.qi)
     noconfl.qi <- intersect(which(!c), ind.qi)
-    mean(fl[confl.qi],na.rm=1) - mean(fl[noconfl.qi],na.rm=1)
+    mean(fl[confl.qi],na.rm = TRUE) - mean(fl[noconfl.qi],na.rm = TRUE)
   })
   # remove possible NAs
   w.not.NA <- which(!is.na(t))
@@ -92,7 +93,7 @@ ts.roaddist <- function(c,fl){
     ind.qi <- roaddist.quantile.groups[[i]]
     confl.qi <- intersect(which(c), ind.qi)
     noconfl.qi <- intersect(which(!c), ind.qi)
-    mean(fl[confl.qi],na.rm=1) - mean(fl[noconfl.qi],na.rm=1)
+    mean(fl[confl.qi],na.rm = TRUE) - mean(fl[noconfl.qi],na.rm = TRUE)
   })
   # remove possible NAs
   w.not.NA <- which(!is.na(t))
@@ -124,7 +125,7 @@ ts.lscm <- function(c, fl){
     w1 <- which(cs & !is.na(fls))
     mean(fls[w1])-mean(fls[w0])
   }
-  mean(dfa,na.rm=1)
+  mean(dfa,na.rm = TRUE)
 }
 
 ########################
@@ -234,4 +235,4 @@ res.frame <- data.frame(ts = c(ts.noconf.data, ts.noconf.res,
                         model = rep(c("noconf", "popdens", "roaddist", "lscm"), each = B+1)
                         )
 
-write.table(res.frame, "resampling_data.txt", quote = FALSE)
+write.table(res.frame, paste0(here::here(), "/data/resampling_data.txt"), quote = FALSE)

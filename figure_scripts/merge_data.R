@@ -1,11 +1,12 @@
+rm(list = ls())
 setwd(dirname(rstudioapi::getActiveDocumentContext()$path))
 
 # dat_meta <- read.table("uniqueID_country-province.txt", header = TRUE, sep="\t")
-dat_meta <- read.csv("uniqueID_country_Biome_LS_Anthrome_20190130.csv", header=T, sep= ",", dec=".")
-dat_popdens <- read.csv("GPWv4_summary_20190129.csv") 
-dat_FL <- read.csv("Hansen_Summaries_ALL_20190821.csv")
-dat_conflict <- read.csv("_PRIO-summaries_ALL_bestEstimate_20191219.csv", header = T, sep=",", dec=".")
-dat_roaddist <- read.csv("RoadDist_Summaries.csv", header = TRUE)
+dat_meta <- read.csv(paste0(here::here(), "/data/uniqueID_country_Biome_LS_Anthrome_20190130.csv"), header=T, sep= ",", dec=".")
+dat_popdens <- read.csv(paste0(here::here(), "/data/GPWv4_summary_20190129.csv")) 
+dat_FL <- read.csv(paste0(here::here(), "/data/Hansen_Summaries_ALL_20190821.csv"))
+dat_conflict <- read.csv(paste0(here::here(), "/data/_PRIO-summaries_ALL_bestEstimate_20191219.csv"), header = T, sep=",", dec=".")
+dat_roaddist <- read.csv(paste0(here::here(), "/data/RoadDist_Summaries.csv"), header = TRUE)
 
 head(dat_popdens)
 head(dat_FL)

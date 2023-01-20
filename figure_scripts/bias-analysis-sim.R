@@ -1,3 +1,4 @@
+rm(list = ls())
 setwd(dirname(rstudioapi::getActiveDocumentContext()$path))
 library(ggplot2)
 library(foreach)
@@ -7,7 +8,7 @@ library(EnvStats)
 theme_set(theme_bw())
 
 
-dat <- read.table("data_xy_colombia_20200616.txt", header = TRUE)
+dat <- read.table(paste0(here::here(), "/data/data_xy_colombia_20200327.txt"), header = TRUE)
 dat <- dat[order(dat$PolygonID),]
 n <- nrow(dat)
 nt <-  length(unique(dat$Year))
@@ -41,7 +42,7 @@ ts.lscm <- function(X, Y){
     w1 <- which(Xs & !is.na(Ys))
     mean(Ys[w1])-mean(Ys[w0])
   }
-  mean(dfa,na.rm=1)
+  mean(dfa,na.rm = TRUE)
 } 
 
 ## only confounder: H
@@ -59,7 +60,7 @@ ts.H <- function(X,Y){
     ind.qi <- H.quantile.groups[[i]]
     confl.qi <- intersect(which(X), ind.qi)
     noconfl.qi <- intersect(which(!X), ind.qi)
-    mean(Y[confl.qi],na.rm=1) - mean(Y[noconfl.qi],na.rm=1)
+    mean(Y[confl.qi],na.rm = TRUE) - mean(Y[noconfl.qi],na.rm = TRUE)
   })
   # remove possible NAs
   w.not.NA <- which(!is.na(t))
@@ -72,7 +73,7 @@ ts.H <- function(X,Y){
 
 ## no confounder
 ts.noconf <- function(X,Y){
-  mean(Y[X],na.rm=1)-mean(Y[!X],na.rm=1)
+  mean(Y[X],na.rm=TRUE)-mean(Y[!X],na.rm=TRUE)
 }
 
 
@@ -136,5 +137,6 @@ for(i in 1:n.sim){
                     bias = ts.hat.out - ts.true.out,
                     sim = i)
   out <- rbind(out, tmp)
-  write.table(out, "2021-02-19_bias-analisys.txt", quote = FALSE)
+  write.table(out, paste0(here::here(), "/data/2021-02-19_bias-analisys.txt"), quote = FALSE)
 }
+

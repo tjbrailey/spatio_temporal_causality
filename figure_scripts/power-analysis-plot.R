@@ -1,3 +1,4 @@
+rm(list = ls())
 setwd(dirname(rstudioapi::getActiveDocumentContext()$path))
 library(ggplot2)
 library(foreach)
@@ -7,13 +8,13 @@ library(EnvStats)
 # source("resampling-test.R")
 theme_set(theme_bw())
 
-ts.frame <- read.table("resampling_data.txt", header = TRUE) # data frame containing test statistics (both from actual data and from resampled data)
+ts.frame <- read.table(paste0(here::here(), "/data/resampling_data.txt"), header = TRUE) # data frame containing test statistics (both from actual data and from resampled data)
 ts.lscm.data <- subset(ts.frame, b==0 & model == "lscm") # LSCM test statistic on actual data
 ts.noconf.data <- subset(ts.frame, b==0 & model == "noconf") # difference in sample avg on actual data
 # ts.lscm.data <- -0.018
 # ts.noconf.data <- 0.073
 
-power.frame <- read.table("2021-02-15_power-analisys.txt")
+power.frame <- read.table(paste0(here::here(), "/data/2021-02-15_power-analisys.txt"))
 
 power.frame.agg <- aggregate(pv ~ b + test, FUN = function(pv) mean(pv<.05), power.frame)
 power.frame.agg$test <- factor(power.frame.agg$test, 
@@ -27,19 +28,13 @@ p.power <- ggplot(power.frame.agg, aes(b,100*pv,col=test, lty = test)) +
   scale_color_manual(values = c("#CC79A7", "#E69F00", "#0072B2", "#009E73")) + 
   scale_linetype_manual(values = c(1,2,1,1)) + 
   # geom_hline(yintercept=5, lty=2, col="red") + 
-  geom_vline(xintercept = abs(ts.lscm.data), lty = "dashed") + 
-  geom_vline(xintercept = abs(ts.noconf.data), lty = "dotted") +
+  geom_vline(xintercept = abs(ts.lscm.data$ts), lty = "dashed") + 
+  geom_vline(xintercept = abs(ts.noconf.data$ts), lty = "dotted") +
   xlab("causal effect of X (beta)") + 
   # ylab("empirical statistical power") + 
-  ylab(expression(paste("number of rejections of ", H[0]))) + 
+  #ylab(expression(paste("number of rejections of ", H[0]))) + 
   theme(legend.position = c(0.65,0.35))
 p.power
 
-pdf("power.pdf", width = 6, height = 4)
-p.power
-dev.off()
-
-pdf("../figures/power.pdf", width = 6, height = 4)
-p.power
-dev.off()
+ggsave(plot = p.power, filename = paste0(here::here(), "/figures/power.pdf"))
 
