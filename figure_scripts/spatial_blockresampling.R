@@ -2,6 +2,7 @@
 # calculating test statistics for different
 # null hypothesis alongside with permutations
 ##################################"
+rm(list = ls())
 setwd(dirname(rstudioapi::getActiveDocumentContext()$path))
 library(ggplot2)
 library(foreach)
@@ -10,7 +11,7 @@ library(reshape2)
 theme_set(theme_bw())
 
 
-df <- read.table("data_xy_colombia_20200616.txt", header = TRUE)
+df <- read.table(paste0(here::here(), "/data/data_xy_colombia_20200327.txt"), header = TRUE)
 n <- nrow(df)
 nt <- length(unique(df$Year))
 ns <- length(unique(df$PolygonID))
@@ -35,7 +36,7 @@ df.sq <- aggregate(lat~square, subset(df,inner), mean)
 df.sq$lon <- aggregate(lon~square, subset(df,inner), mean)$lon
 df.sq$square <- 1:nrow(df.sq)
 
-write.table(df.sq, "spatial-blocks.txt", quote=FALSE)
+write.table(df.sq, paste0(here::here(), "/data/spatial-blocks.txt"), quote=FALSE)
 
 p <- ggplot() + 
   geom_rect(data=subset(df,Year==2000), aes(xmin=lon-d.pixel/2, xmax=lon+d.pixel/2, ymin=lat-d.pixel/2, ymax=lat+d.pixel/2), alpha=.5, size=.05) + 
@@ -71,7 +72,7 @@ w.outer <- (num.blocks*fact^2+1):n
 
 # test statistic
 ts <- function(c,fl){
-  mean(fl[c],na.rm=1)-mean(fl[!c],na.rm=1)
+  mean(fl[c],na.rm=TRUE)-mean(fl[!c],na.rm=TRUE)
 }
 
 ts.data <- ts(c,fl)
@@ -100,7 +101,7 @@ ts.res.block <- foreach(b=1:B, .combine = "c") %do% {
   ts(c,fl.res)
 }
 # loading result from the resampling test performed in the script resampling_sim.R
-ts.res.random <- subset(read.table("resampling_data_new.txt", header = TRUE), test=="marginal" & b > 0)$t
+ts.res.random <- subset(read.table(paste0(here::here(), "/data/resampling_data.txt"), header = TRUE), model=="noconf" & b > 0)$t
 
 df.plt <- data.frame(ts = c(ts.res.block, ts.res.random), 
                      method = rep(c("block permutation", "random permutation"), each=B))
@@ -114,9 +115,8 @@ p.res <- ggplot(df.plt, aes(x=ts)) + geom_histogram(color="gray", alpha=.7) +
         plot.title = element_text(hjust=.5), 
         plot.margin = margin(t=2, r=2, b=2, l=15, unit="mm"))
 
-pdf("../figures/spatial_block_resampling_all.pdf", width = 10, height = 6)
-grid.arrange(p, p.res,ncol=2)
-dev.off()
+plotfinal <- grid.arrange(p, p.res,ncol=2)
+ggsave(plotfinal, filename = paste0(here::here(), "/figures/spatial_block_resampling_all.pdf"))
 
 (pv.block <- min(1,2*min((1+sum(ts.res.block <= ts.data))/(1+B), (1+sum(ts.res.block >= ts.data))/(1+B)))) # 0.008
 (pv.random <- min(1,2*min((1+sum(ts.res.random <= ts.data))/(1+B), (1+sum(ts.res.random >= ts.data))/(1+B)))) # 0.002

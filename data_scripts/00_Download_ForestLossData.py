@@ -9,7 +9,7 @@ print("--------------------------------------------------------")
 print("Starting process, time:" + starttime)
 print("")
 # ####################################### FOLDER PATHS AND FUNCTIONS ########################################## #
-dl_Folder = "D:/baumamat/Warfare/_Variables/Forest/"
+dl_Folder = "C:/Users/tbrai/Dropbox/github_private/spatio_temporal_causality/data"
 baseURL = "https://storage.googleapis.com/earthenginepartners-hansen/GFC-2018-v1.6/Hansen_GFC-2018-v1.6"
 layers = [["_treecover2000_", "Forest2000"], ["_gain_", "Gain"], ["_lossyear_", "LossYear"]]
 ext = ".tif"

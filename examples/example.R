@@ -145,6 +145,8 @@ linedata <- data.frame(intercept = bhat.data[,1],
 # green: avg causal effect (unknown)
 # thin blue: linear regressions within each locatino
 # thick blue: estimate of the avg causal effect
+df <- as.data.frame(cbind(X, Y, H1, H2))
+
 p <- ggplot(df, aes(X,Y)) + geom_point(alpha=.7, aes(col=H1*H2)) + 
   scale_color_gradient(name = expression(paste(bar(H)," * ",tilde(H))), low="black", high="gray") + 
   geom_abline(data=linedata, aes(slope=slope, intercept=intercept), col = "blue", alpha = .15, size = .5) + 

@@ -1,3 +1,4 @@
+rm(list = ls())
 setwd(dirname(rstudioapi::getActiveDocumentContext()$path))
 library(ggplot2)
 library(reshape2)
@@ -142,6 +143,7 @@ y <- df$Y
 # for each setting, at each spatial location, do: 
 # * a marginal regression of Ys onto Xs, AND
 # * a regression of Ys onto (Xs, Hbars) & averaging out Hbar
+# sim takes a long time
 coef.per.location <- foreach(i = 1:(n.rep*n.sigma), .combine = "rbind") %do% {
   index.dataset <- n.time*n.space*(i-1) # last index before current dataset
   hbar.i <- hbar[(index.dataset+1):(index.dataset + n.time*n.space)] # realization of Hbar for current setting and repetition
@@ -192,7 +194,7 @@ df.coef$b0[1:(2*n.settings)] <- bhat[,1]
 df.coef$b1[1:(2*n.settings)] <- bhat[,2]
 df.coef$err <- sqrt((df.coef$b0-1)^2 + (df.coef$b1-2)^2)
 df.coef$var <- df.coef$sigma^2
-write.table(df.coef, "time-var-conf.txt", quote = FALSE)
+write.table(df.coef, paste0(here::here(), "/data/time-var-conf.txt"), quote = FALSE)
 
 
 

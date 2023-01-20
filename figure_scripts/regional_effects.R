@@ -2,6 +2,7 @@
 # calculating test statistics for different
 # null hypothesis alongside with permutations
 ##################################"
+rm(list = ls())
 setwd(dirname(rstudioapi::getActiveDocumentContext()$path))
 library(ggplot2)
 library(foreach)
@@ -9,8 +10,8 @@ library(gridExtra)
 library(reshape2)
 theme_set(theme_bw())
 
-df <- read.table("data_xy_colombia_20200616.txt", header = T)
-df.prov <- read.table("uniqueID_country-province.txt", header = TRUE, sep = "\t")
+df <- read.table(paste0(here::here(), "/data/data_xy_colombia_20200327.txt"), header = T)
+df.prov <- read.table(paste0(here::here(), "/data/uniqueID_country-province.txt"), header = TRUE, sep = "\t")
 df.prov <- subset(df.prov, GID_0 == "COL")
 ns <- length(unique(df$PolygonID))
 nt <- length(unique(df$Year))
@@ -96,21 +97,6 @@ pvframe <- aggregate(t ~ province, df.test.stat.melt, FUN = pvfun)
 colnames(pvframe)[2] <- "pval"
 pvframe$t <- subset(df.test.stat.melt, b==0)$t
 
-prov.NA <- setdiff(df.plt$province, pvframe$province)
-pvframe.NA <- data.frame(province = prov.NA, pval = NA, t = NA)
-pvframe <- rbind(pvframe, pvframe.NA)
-
-write.table(pvframe, "regional_effects.txt", quote = FALSE, sep = "\t")
-pvframe <- read.table("regional_effects.txt", header = TRUE, sep = "\t")
-
-ggplot(subset(df.test.stat.melt, b > 0), aes(x=t)) + geom_histogram(color="gray", alpha=0.7) + 
-  facet_wrap(.~province) + 
-  geom_vline(data=pvframe, aes(xintercept=t, col=t), size = 1) + 
-  scale_color_distiller(palette="RdYlBu") + 
-  geom_text(data=pvframe, aes(x=0, y=B/2,label=round(pval,3)), size = 5) + 
-  xlab("test statistic")
-
-
 df.plt <- subset(df, Year == 2000)
 df.plt$province <- as.character(df.plt$province)
 df.plt <- df.plt[order(df.plt$province),]
@@ -121,12 +107,25 @@ df.plt$pval <- unlist(sapply(1:length(n.prov), function(i) rep(pvframe$pval[i], 
 df.plt$effect <- factor(sign(df.plt$t), levels = c(-1,1), labels = c("positive", "negative"))
 df.plt$significant <- factor(df.plt$pval <= 0.05, levels = c(TRUE, FALSE), labels = c("true", "false"))
 
+prov.NA <- setdiff(df.plt$province, pvframe$province)
+pvframe.NA <- data.frame(province = prov.NA, pval = NA, t = NA)
+pvframe <- rbind(pvframe, pvframe.NA)
+
+write.table(pvframe, paste0(here::here(), "/data/regional_effects.txt"), quote = FALSE, sep = "\t")
+pvframe <- read.table(paste0(here::here(), "/data/regional_effects.txt"), header = TRUE, sep = "\t")
+
+ggplot(subset(df.test.stat.melt, b > 0), aes(x=t)) + geom_histogram(color="gray", alpha=0.7) + 
+  facet_wrap(.~province) + 
+  geom_vline(data=pvframe, aes(xintercept=t, col=t), size = 1) + 
+  scale_color_distiller(palette="RdYlBu") + 
+  geom_text(data=pvframe, aes(x=0, y=B/2,label=round(pval,3)), size = 5) + 
+  xlab("test statistic")
+
 df.agg1 <- aggregate(nr_fatalities ~ lat + lon, df, function(x) any(x>0))
 df.agg1 <- subset(df.agg1, nr_fatalities)[,1:2]
-write.table(df.agg1, "colombia_conflict_locations_2000-2018.txt", quote = FALSE)
+write.table(df.agg1, paste0(here::here(), "/data/colombia_conflict_locations_2000-2018.txt"), quote = FALSE)
 
 
-pdf("../figures/regional_effects.pdf", width = 5.07, height = 5.8)
 ggplot() + geom_tile(data=df.plt, aes(lon, lat, fill=effect, alpha=significant)) + 
   geom_point(data = df.agg1, aes(lon, lat), col = "red", shape = 4) + 
   geom_text(data=df.agg, aes(x=lon, y=lat, label=nr_fatalities)) +
@@ -136,7 +135,7 @@ ggplot() + geom_tile(data=df.plt, aes(lon, lat, fill=effect, alpha=significant))
         axis.text = element_blank(), 
         axis.ticks = element_blank()) + 
   xlab("") + ylab("")
-dev.off()
+ggsave(plot = last_plot(), filename = paste0(here::here(), "/figures/regional_effects.pdf"))
 
 
 ggplot() + geom_tile(data=df.plt, aes(lon, lat, fill=t)) + 

@@ -1,0 +1,15 @@
+.Rproj.user
+.Rhistory
+.RData
+.Ruserdata
+data/2021-02-15_power-analisys.txt
+data/2021-02-19_bias-analisys.txt
+data/colombia_conflict_locations_2000-2018.txt
+data/CSTM_example_bhat_frame.txt
+data/CSTM_example_sim.txt
+data/data_xy_colombia_regional_summaries_20200432.txt
+data/data_xy_colombia_temporally_aggregated_20200616.txt
+data/regional_effects.txt
+data/resampling_data.txt
+data/spatial-blocks.txt
+data/time-var-conf.txt

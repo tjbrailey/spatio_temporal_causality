@@ -2,6 +2,7 @@
 # calculating test statistics for different
 # null hypothesis alongside with permutations
 ##################################"
+rm(list = ls())
 setwd(dirname(rstudioapi::getActiveDocumentContext()$path))
 library(ggplot2)
 library(foreach)
@@ -13,7 +14,7 @@ theme_set(theme_bw())
 # dat1 <- subset(dat, country_name == "COL")
 # dat1 <- read.table("data_xy_colombia_20191219.txt", header = TRUE)
 # dat1 <- read.table("data_xy_colombia_20200316.txt", header = TRUE)
-dat1 <- read.table("data_xy_colombia_20200616.txt", header = TRUE)
+dat1 <- read.table(paste0(here::here(), "/data/data_xy_colombia_20200327.txt"), header = TRUE)
 w <- which(dat1$xFor2000_ge25==0)
 dat1 <- dat1[-w,]
 n <- nrow(dat1)
@@ -56,7 +57,7 @@ Tpixel <- function(c,fl){
 }
 
 tpixelvec <- Tpixel(c,fl)
-tpixel <- mean(tpixelvec ,na.rm=1)
+tpixel <- mean(tpixelvec ,na.rm = TRUE)
 
 
 B <- 999
@@ -73,7 +74,7 @@ Tpixelboot <- foreach(b=0:B, .combine="rbind") %do% {
   
   flb <- fl[zz]
   
-  mean(Tpixel(c,flb),na.rm=1)
+  mean(Tpixel(c,flb),na.rm = TRUE)
 }
 
 hist(Tpixelboot[-1], breaks = 20)

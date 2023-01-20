@@ -1,3 +1,4 @@
+rm(list = ls())
 setwd(dirname(rstudioapi::getActiveDocumentContext()$path))
 library(ggplot2)
 library(gridExtra)
@@ -45,8 +46,8 @@ btrue <- c(2, .25) # ground truth if h is uniform(0,2)
 pconf <- ggplot(df1, aes(x,y)) + geom_point(alpha=.7) + 
   xlab("X") + ylab("Y") + 
   coord_cartesian(xlim=range(x),ylim=range(y)) + 
-  geom_abline(intercept = bconf[1], slope = bconf[2], col="red", size=1.5) + 
-  geom_abline(intercept = btrue[1], slope = btrue[2], col="green", size=1.5, lty = 2) + 
+  geom_abline(intercept = bconf[1], slope = bconf[2], col="red", linewidth=1.5) + 
+  geom_abline(intercept = btrue[1], slope = btrue[2], col="green", linewidth=1.5, lty = 2) + 
   theme(panel.grid = element_blank(), 
         axis.line = element_blank(), 
         axis.text = element_blank(),
@@ -56,7 +57,7 @@ pconf <- ggplot(df1, aes(x,y)) + geom_point(alpha=.7) +
 pXY1 <- ggplot(subset(df1, abs(h-1) < .05), aes(x,y)) + geom_point(alpha=.7) + 
   # xlab("X") + ylab("Y") + 
   coord_cartesian(xlim=range(x),ylim=range(y)) + 
-  geom_abline(intercept = b10[1], slope = b10[2], col="blue", size=1) + 
+  geom_abline(intercept = b10[1], slope = b10[2], col="blue", linewidth=1) + 
   theme(panel.grid = element_blank(), 
         axis.line = element_blank(), 
         axis.text = element_blank(), 
@@ -66,7 +67,7 @@ pXY1 <- ggplot(subset(df1, abs(h-1) < .05), aes(x,y)) + geom_point(alpha=.7) +
 pXY2 <- ggplot(subset(df1, abs(h-.4)<.05), aes(x,y)) + geom_point(alpha=.7) + 
   # xlab("X") + ylab("Y") + 
   coord_cartesian(xlim=range(x),ylim=range(y)) + 
-  geom_abline(intercept = b05[1], slope = b05[2], col="blue", size=1) + 
+  geom_abline(intercept = b05[1], slope = b05[2], col="blue", linewidth=1) + 
   theme(panel.grid = element_blank(), 
         axis.line = element_blank(), 
         axis.text = element_blank(), 
@@ -76,7 +77,7 @@ pXY2 <- ggplot(subset(df1, abs(h-.4)<.05), aes(x,y)) + geom_point(alpha=.7) +
 pXY3 <- ggplot(subset(df1, abs(h-1.6)<.05), aes(x,y)) + geom_point(alpha=.7) + 
   # xlab("X") + ylab("Y") + 
   coord_cartesian(xlim=range(x),ylim=range(y)) + 
-  geom_abline(intercept = b15[1], slope = b15[2], col="blue", size=1) + 
+  geom_abline(intercept = b15[1], slope = b15[2], col="blue", linewidth=1) + 
   theme(panel.grid = element_blank(), 
         axis.line = element_blank(), 
         axis.text = element_blank(), 
@@ -86,37 +87,14 @@ pXY3 <- ggplot(subset(df1, abs(h-1.6)<.05), aes(x,y)) + geom_point(alpha=.7) +
 pavgcausal <- ggplot(df1, aes(x,y)) + geom_point(alpha=.7) + 
   xlab("X") + ylab("Y") + 
   coord_cartesian(xlim=range(x),ylim=range(y)) + 
-  geom_abline(intercept=bavgcausal[1], slope=bavgcausal[2], col="blue", size=1.5) + 
-  geom_abline(intercept = btrue[1], slope = btrue[2], col="green", size=1.5, lty = 2) + 
+  geom_abline(intercept=bavgcausal[1], slope=bavgcausal[2], col="blue", linewidth=1.5) + 
+  geom_abline(intercept = btrue[1], slope = btrue[2], col="green", linewidth=1.5, lty = 2) + 
   theme(panel.grid = element_blank(), 
         axis.line = element_blank(), 
         axis.text = element_blank(), 
         axis.ticks = element_blank(), 
         axis.title = element_text(size=15))
 
-grid.arrange(pconf, pXY1, pXY2, pXY3, pavgcausal, nrow=1)
+plotfinal <- grid.arrange(pconf, pXY1, pXY2, pXY3, pavgcausal, nrow=1)
 
-pdf("../figures/pH_new.pdf", width = 10, height = 1.5)
-pH
-dev.off()
-
-pdf("../figures/pconf.pdf", width = 4, height = 3)
-pconf
-dev.off()
-
-pdf("../figures/pavgcausal.pdf", width = 4, height = 3)
-pavgcausal
-dev.off()
-
-
-pdf("../figures/pXY1_new.pdf", width = 4, height = 3)
-pXY1
-dev.off()
-
-pdf("../figures/pXY2_new.pdf", width = 4, height = 3)
-pXY2
-dev.off()
-
-pdf("../figures/pXY3_new.pdf", width = 4, height = 3)
-pXY3
-dev.off()
+ggsave(plot = plotfinal, filename = paste0(here::here(), "/figures/concept.pdf"))

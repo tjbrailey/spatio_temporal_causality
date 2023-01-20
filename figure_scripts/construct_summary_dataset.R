@@ -1,3 +1,4 @@
+rm(list = ls())
 # construct summary data set
 setwd(dirname(rstudioapi::getActiveDocumentContext()$path))
 library(ggplot2)
@@ -5,7 +6,7 @@ library(gridExtra)
 library(viridis)
 theme_set(theme_bw())
 
-df <- read.table("data_xy_colombia_20200616.txt", header = TRUE)
+df <- read.table(paste0(here::here(), "/data/data_xy_colombia_20200327.txt"), header = TRUE)
 df.noforest <- subset(df, xFor2000_ge25 == 0 & Year == 2000)
 poly.noforest <- df.noforest$PolygonID
 df.agg <- aggregate(FL_km ~ lon + lat, df, sum, na.rm = TRUE, na.action=NULL)
@@ -18,16 +19,16 @@ df.agg$conflict_location <- aggregate(nr_fatalities ~ lon + lat, df, function(x)
 
 c <- df$nr_fatalities>0
 fl <- df$FL_km
-mean(fl[c], na.rm=1) # 0.266
-mean(fl[!c], na.rm=1) # 0.193
+mean(fl[c], na.rm=TRUE) # 0.266
+mean(fl[!c], na.rm=TRUE) # 0.193
 round(t.test(fl~c)$p.value,12) # 8.89e-10
 
-write.table(df.agg, "data_xy_colombia_temporally_aggregated_20200616.txt", quote=FALSE)
+write.table(df.agg, paste0(here::here(), "/data/data_xy_colombia_temporally_aggregated_20200616.txt"), quote=FALSE)
 
 
 ################# summaries on province level
 
-df.prov <- read.table("uniqueID_country-province.txt", header = TRUE, sep = "\t")
+df.prov <- read.table(paste0(here::here(), "/data/uniqueID_country-province.txt"), header = TRUE, sep = "\t")
 df.prov <- subset(df.prov, GID_0 == "COL")
 ns <- length(unique(df$PolygonID))
 nt <- length(unique(df$Year))
@@ -38,5 +39,5 @@ df$province <- factor(rep(as.character(df.prov$NAME_1), each = nt))
 df.agg.prov <- aggregate(FL_km ~ province, df, sum, na.rm = TRUE, na.action=NULL)
 df.agg.prov$nr_conflicts <- aggregate(nr_fatalities ~ province, df, function(x) sum(x>0))$nr_fatalities
 
-write.table(df.agg.prov, "data_xy_colombia_regional_summaries_20200432.txt", quote=FALSE)
+write.table(df.agg.prov, paste0(here::here(), "/data/data_xy_colombia_regional_summaries_20200432.txt"), quote=FALSE)
 
